@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timer DARUSLAN</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: #c8d1d9;
+    }
+
+    .top-spacer {
+      height: 25vh;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+    }
+
+    .top-spacer img {
+      max-height: 80%;
+      max-width: 90%;
+      object-fit: contain;
+    }
+
+    .main-wrapper {
+      height: 75vh;
+      width: 100%;
+      padding: 0 40px 40px 40px;
+    }
+
+    .glass-card {
+      height: 100%;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(255, 255, 255, 0.5);
+      border-radius: 28px;
+      padding: 40px;
+      box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.15);
+      color: #1a252f;
+      
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+    }
+
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border-right: 2px solid rgba(255, 255, 255, 0.4);
+      padding-right: 30px;
+    }
+
+    .timer-display {
+      font-size: 6rem;
+      font-weight: 800;
+      letter-spacing: 3px;
+      margin-bottom: 40px;
+      font-variant-numeric: tabular-nums;
+      color: #0f172a;
+      text-shadow: 0 4px 12px rgba(255, 255, 255, 0.6);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    button {
+      flex: 1;
+      padding: 18px 16px;
+      border: 1.5px solid rgba(255, 255, 255, 0.6);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(8px);
+      color: #0f172a;
+      font-weight: 700;
+      font-size: 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    button:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.8);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .right-panel h3 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+      padding-bottom: 12px;
+      color: #0f172a;
+    }
+
+    .lap-list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 12px;
+    }
+
+    .lap-list-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .lap-list-container::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 4px;
+    }
+
+    .lap-list {
+      list-style: none;
+    }
+
+    .lap-item {
+      background: rgba(255, 255, 255, 0.45);
+      margin-bottom: 14px;
+      padding: 18px 24px;
+      border-radius: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.25rem;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    .lap-phase {
+      font-weight: 600;
+      color: #0f172a;
+      padding-right: 15px;
+    }
+
+    .lap-time {
+      font-family: monospace;
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #0369a1;
+    }
+
+    @media (max-width: 992px) {
+      .top-spacer { height: 15vh; }
+      .main-wrapper { height: 85vh; padding: 15px; }
+      .glass-card { grid-template-columns: 1fr; gap: 20px; padding: 25px; }
+      .left-panel { border-right: none; border-bottom: 2px solid rgba(255, 255, 255, 0.4); padding-right: 0; padding-bottom: 25px; }
+      .timer-display { font-size: 3.8rem; margin-bottom: 20px; }
+      button { padding: 12px 10px; font-size: 1rem; }
+      .right-panel h3 { font-size: 1.4rem; }
+      .lap-item { padding: 12px 16px; font-size: 1rem; }
+      .lap-time { font-size: 1.15rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-spacer">
+    <img src="assets/background-1.png" alt="Header Logo/Image">
+  </div>
+
+  <div class="main-wrapper">
+    <div class="glass-card">
+      
+      <div class="left-panel">
+        <div class="timer-display" id="display">00:00:00.00</div>
+        <div class="button-group">
+          <button id="startBtn">Start</button>
+          <button id="lapBtn" disabled>Lap Fase</button>
+          <button id="stopBtn" disabled>Stop</button>
+          <button id="clearBtn">Clear</button>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <h3>Catatan Lap Fase</h3>
+        <div class="lap-list-container">
+          <ul class="lap-list" id="lapList"></ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const phaseLabels = [
+      "GELAGAR MEMANJANG",
+      "GELAGAR MELINTANG",
+      "PELENGKUNG",
+      "KABEL",
+      "PENGENCANGAN"
+    ];
+
+    let currentPhaseIndex = 0;
+    let startTime = 0;
+    let elapsedTime = 0;
+    let timerInterval = null;
+
+    const display = document.getElementById('display');
+    const startBtn = document.getElementById('startBtn');
+    const lapBtn = document.getElementById('lapBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const lapList = document.getElementById('lapList');
+
+    function formatTime(ms) {
+      const date = new Date(ms);
+      const hours = String(Math.floor(ms / (1000 * 60 * 60))).padStart(2, '0');
+      const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+      const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+      const milliseconds = String(Math.floor(date.getUTCMilliseconds() / 10)).padStart(2, '0');
+      
+      return `${hours}:${minutes}:${seconds}.${milliseconds}`;
+    }
+
+    function updateDisplay() {
+      const currentTime = Date.now();
+      elapsedTime = currentTime - startTime;
+      display.textContent = formatTime(elapsedTime);
+    }
+
+    startBtn.addEventListener('click', () => {
+      if (!timerInterval) {
+        startTime = Date.now() - elapsedTime;
+        timerInterval = setInterval(updateDisplay, 10);
+        
+        startBtn.disabled = true;
+        lapBtn.disabled = false;
+        stopBtn.disabled = false;
+      }
+    });
+
+    lapBtn.addEventListener('click', () => {
+      if (currentPhaseIndex < phaseLabels.length) {
+        const lapItem = document.createElement('li');
+        lapItem.className = 'lap-item';
+        
+        const phaseText = phaseLabels[currentPhaseIndex];
+        const formattedTime = formatTime(elapsedTime);
+
+        lapItem.innerHTML = `
+          <span class="lap-phase">${currentPhaseIndex + 1}. ${phaseText}</span>
+          <span class="lap-time">${formattedTime}</span>
+        `;
+
+        lapList.appendChild(lapItem);
+        currentPhaseIndex++;
+
+        if (currentPhaseIndex >= phaseLabels.length) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          
+          lapBtn.disabled = true;
+          stopBtn.disabled = true;
+          startBtn.disabled = true;
+        }
+      }
+    });
+
+    stopBtn.addEventListener('click', () => {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      
+      startBtn.disabled = false;
+      startBtn.textContent = 'Lanjutkan';
+      lapBtn.disabled = true;
+      stopBtn.disabled = true;
+    });
+
+    clearBtn.addEventListener('click', () => {
+      clearInterval(timerInterval);
+      timerInterval = null;
+
+      elapsedTime = 0;
+      currentPhaseIndex = 0;
+
+      display.textContent = "00:00:00.00";
+      lapList.innerHTML = "";
+
+      startBtn.disabled = false;
+      startBtn.textContent = 'Start';
+      lapBtn.disabled = true;
+      stopBtn.disabled = true;
+    });
+  </script>
+</body>
+</html>
